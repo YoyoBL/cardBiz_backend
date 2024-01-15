@@ -1,0 +1,32 @@
+@local = http://localhost:3000
+
+GET {{local}}/users
+
+###
+
+POST {{local}}/users
+Content-Type: application/json
+
+{
+  "name": {
+    "first": "ggg",
+    "middle": "",
+    "last": "Vis"
+  },
+  "phone": "0512345567",
+  "email": "ellvis12345678@email.com",
+  "password": "Abc!123Abc",
+  "image": {
+    "url": "",
+    "alt": ""
+  },
+  "address": {
+    "state": "IL",
+    "country": "Israel",
+    "city": "Arad",
+    "street": "Shoham",
+    "houseNumber": 5,
+    "zip": 8920435
+  },
+  "isBusiness": true
+}
