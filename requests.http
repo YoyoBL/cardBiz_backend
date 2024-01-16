@@ -1,8 +1,9 @@
 @local = http://localhost:3000
 @bizToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWE1NTY3NWVmOGQ2MjkzYmVkMTU0NTciLCJpc0J1c2luZXNzIjp0cnVlLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzA1MzM1NDg2fQ.9frMHFDtLK4fYvM1ePJCXsrtjFGbeVswA9jUsxprDG8
+@bizId = 65a55675ef8d6293bed15457
 
 @adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWE1NTM4YjQ3MTAxYzc3OWQ0MjQ1N2YiLCJpc0J1c2luZXNzIjp0cnVlLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MDU0MDEzNzZ9.YExceWHPANcPQUlWypDZqDtm9Z81EzNZFUrueI5ZCh4
-
+@adminId = 65a5538b47101c779d42457f
 ### GET ALL USERS
 POST {{local}}/users
 content-type:application/json
@@ -42,12 +43,17 @@ Content-Type: application/json
 POST {{local}}/users/login
 Content-Type: application/json
 
+# {
+#   "email":"yoel@email.com",
+#   "password": "Abc!123Abc"
+# }
+
 {
-  "email":"yoel@email.com",
+  "email":"test1@email.com",
   "password": "Abc!123Abc"
 }
 
-# {
-#   "email":"test1@email.com",
-#   "password": "Abc!123Abc"
-# }
+### GET USER BY ID
+GET {{local}}/users/{{bizId}}
+x-auth-token :{{adminToken}}
+

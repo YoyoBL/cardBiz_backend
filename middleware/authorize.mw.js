@@ -1,10 +1,15 @@
 const jwt = require("jsonwebtoken");
 
-function authByRole(role) {
+function authByRole(role = "business") {
    const rolesList = {
       admin: "isAdmin",
       business: "isBusiness",
+      standard: "standard",
    };
+
+   if (!rolesList[role]) {
+      throw new Error("Role provided doesn't exists");
+   }
 
    const roleKey = rolesList[role];
 
@@ -14,11 +19,11 @@ function authByRole(role) {
 
       try {
          const payload = jwt.verify(token, process.env.JWT_SECRET);
-         console.log(payload);
 
          //adding the user key to the req obj
          req.user = payload;
 
+         if (role === "standard") return next();
          //checks if role is not allowed
          if (!payload[roleKey]) {
             return res.status(400).send(`Access denied, ${role} only.`);

@@ -4,9 +4,9 @@ const Joi = require("joi");
 const router = require("express").Router();
 const _ = require("lodash");
 const { authByRole } = require("../middleware/authorize.mw");
+const { default: mongoose } = require("mongoose");
 
 //GET ALL USERS
-
 router.post("/", authByRole("admin"), async (req, res) => {
    const users = await User.find({});
 
@@ -60,6 +60,28 @@ router.post("/login", async (req, res) => {
 
    // response
    return res.json(token);
+});
+
+//GET USER BY ID
+router.get("/:id", authByRole("standard"), async (req, res) => {
+   // validate system
+   const _id = req.params.id;
+   const isIdValid = mongoose.Types.ObjectId.isValid(_id);
+   if (!isIdValid) throw new Error("Invalid ID structure");
+
+   console.log(req.user._id !== _id);
+   //registered user or Admin
+   if (!req.user.isAdmin && req.user._id !== _id) {
+      return res
+         .status(400)
+         .send("Denied. You need to be the registered user or Admin");
+   }
+
+   const user = await User.findById(_id);
+   if (!user) res.status(400).send("User doesn't exists.");
+
+   //response
+   res.send(user);
 });
 
 function validateLogin(body) {
