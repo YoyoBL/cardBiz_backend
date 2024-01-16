@@ -1,20 +1,26 @@
 @local = http://localhost:3000
+@bizToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWE1NTY3NWVmOGQ2MjkzYmVkMTU0NTciLCJpc0J1c2luZXNzIjp0cnVlLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzA1MzM1NDg2fQ.9frMHFDtLK4fYvM1ePJCXsrtjFGbeVswA9jUsxprDG8
 
-GET {{local}}/users
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWE1NTM4YjQ3MTAxYzc3OWQ0MjQ1N2YiLCJpc0J1c2luZXNzIjp0cnVlLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MDU0MDEzNzZ9.YExceWHPANcPQUlWypDZqDtm9Z81EzNZFUrueI5ZCh4
 
-###
+### GET ALL USERS
+POST {{local}}/users
+content-type:application/json
+x-auth-token :{{adminToken}}
 
+
+### REGISTER
 POST {{local}}/users
 Content-Type: application/json
 
 {
   "name": {
-    "first": "ggg",
+    "first": "test1",
     "middle": "",
-    "last": "Vis"
+    "last": "test"
   },
   "phone": "0512345567",
-  "email": "ellvis12345678@email.com",
+  "email": "test1@email.com",
   "password": "Abc!123Abc",
   "image": {
     "url": "",
@@ -30,3 +36,18 @@ Content-Type: application/json
   },
   "isBusiness": true
 }
+
+### LOGIN
+
+POST {{local}}/users/login
+Content-Type: application/json
+
+{
+  "email":"yoel@email.com",
+  "password": "Abc!123Abc"
+}
+
+# {
+#   "email":"test1@email.com",
+#   "password": "Abc!123Abc"
+# }

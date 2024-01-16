@@ -1,95 +1,116 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
 
-const userSchema = new mongoose.Schema({
-   name: {
-      first: { type: String, required: true, minlength: 2, maxlength: 256 },
-      middle: {
-         type: String,
-         required: false,
-         minlength: 0,
-         maxlength: 256,
-      },
+const userSchema = new mongoose.Schema(
+   {
+      name: {
+         first: { type: String, required: true, minlength: 2, maxlength: 256 },
+         middle: {
+            type: String,
+            required: false,
+            minlength: 0,
+            maxlength: 256,
+         },
 
-      last: {
+         last: {
+            type: String,
+            required: true,
+            minlength: 2,
+            maxlength: 256,
+         },
+      },
+      phone: {
          type: String,
          required: true,
          minlength: 2,
-         maxlength: 256,
+         maxlength: 11,
       },
-   },
-   phone: {
-      type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 11,
-   },
-   email: {
-      type: String,
-      required: true,
-      minlength: 5,
-      unique: true,
-   },
-   password: {
-      type: String,
-      required: true,
-      minlength: 7,
-   },
-   image: {
-      url: {
-         type: String,
-      },
-      alt: {
-         type: String,
-         maxlength: 256,
-      },
-   },
-   address: {
-      state: {
-         type: String,
-         required: false,
-         maxlength: 256,
-      },
-      country: {
+      email: {
          type: String,
          required: true,
-         minlength: 2,
-         maxlength: 256,
+         minlength: 5,
+         unique: true,
       },
-      city: {
+      password: {
          type: String,
          required: true,
-         minlength: 2,
-         maxlength: 256,
+         minlength: 7,
       },
-      street: {
-         type: String,
-         required: true,
-         minlength: 2,
-         maxlength: 256,
+      image: {
+         url: {
+            type: String,
+         },
+         alt: {
+            type: String,
+            maxlength: 256,
+         },
       },
-      houseNumber: {
-         type: Number,
-         required: true,
-         minlength: 2,
-         maxlength: 256,
+      address: {
+         state: {
+            type: String,
+            required: false,
+            maxlength: 256,
+         },
+         country: {
+            type: String,
+            required: true,
+            minlength: 2,
+            maxlength: 256,
+         },
+         city: {
+            type: String,
+            required: true,
+            minlength: 2,
+            maxlength: 256,
+         },
+         street: {
+            type: String,
+            required: true,
+            minlength: 2,
+            maxlength: 256,
+         },
+         houseNumber: {
+            type: Number,
+            required: true,
+            minlength: 2,
+            maxlength: 256,
+         },
+         zip: {
+            type: Number,
+            required: true,
+            minlength: 2,
+            maxlength: 256,
+         },
       },
-      zip: {
-         type: Number,
+      isBusiness: {
+         type: Boolean,
          required: true,
-         minlength: 2,
-         maxlength: 256,
+      },
+      isAdmin: {
+         type: Boolean,
+         required: true,
+      },
+      createdAt: {
+         type: Date,
+         default: Date.now,
       },
    },
-   isBusiness: {
-      type: Boolean,
-      required: true,
-   },
-   createdAt: {
-      type: Date,
-      default: Date.now,
-   },
-});
+   {
+      methods: {
+         generateAuthToken() {
+            return jwt.sign(
+               {
+                  _id: this._id,
+                  isBusiness: this.isBusiness,
+                  isAdmin: this.isAdmin,
+               },
+               process.env.JWT_SECRET
+            );
+         },
+      },
+   }
+);
 
 const User = mongoose.model("User", userSchema, "users");
 
@@ -144,6 +165,7 @@ function validateUser(user) {
             .allow(""),
       }).required(),
       isBusiness: Joi.boolean().required().label("Account plan"),
+      isAdmin: Joi.boolean(),
    }).required();
 
    return schema.validate(user);
