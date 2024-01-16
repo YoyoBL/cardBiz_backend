@@ -171,7 +171,74 @@ function validateUser(user) {
    return schema.validate(user);
 }
 
+function validateLogin(body) {
+   const schema = Joi.object({
+      email: Joi.string()
+         .min(5)
+         .required()
+         .email({ tlds: { allow: false } }),
+      password: Joi.string()
+         .min(7)
+         .max(20)
+         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*-])(?=.{9,})/)
+         .message(
+            "'Password' must be at least 9 characters long and contain an uppercase letter, a lower case letter, a number and one of the following characters !@#$%^&*- "
+         )
+         .required(),
+   }).required();
+   return schema.validate(body);
+}
+
+function validateUserUpdate(body) {
+   const schema = Joi.object({
+      name: Joi.object({
+         first: Joi.string().min(2).max(256).required().label("First"),
+         middle: Joi.string().min(2).max(256).label("Middle").allow(""),
+         last: Joi.string().min(2).max(256).required().label("Last"),
+      })
+         .label("name")
+         .required(),
+      phone: Joi.string()
+         .min(9)
+         .max(11)
+         .regex(/^0[2-9]\d{7,8}$/)
+         .message('"phone" must be a standard Israeli phone number')
+         .required(),
+
+      email: Joi.string()
+         .min(5)
+         .required()
+         .email({ tlds: { allow: false } }),
+
+      image: Joi.object({
+         url: Joi.string().uri().allow("").label("Image url"),
+         alt: Joi.string().min(2).max(40).allow("").label("Image alt"),
+      }),
+      address: Joi.object({
+         state: Joi.string().min(2).max(256).label("State"),
+         country: Joi.string().min(2).max(256).required().label("Country"),
+         city: Joi.string().min(2).max(256).required().label("City"),
+         street: Joi.string().min(2).max(256).required().label("Street"),
+         houseNumber: Joi.number()
+            .min(1)
+            .max(9999999999)
+            .required()
+            .label("House number"),
+         zip: Joi.number()
+            .min(0)
+            .max(9999999999)
+            .required()
+            .label("Zip")
+            .allow(""),
+      }).required(),
+   }).required();
+
+   return schema.validate(body);
+}
+
 module.exports = {
    User,
    validateUser,
+   validateLogin,
+   validateUserUpdate,
 };
