@@ -4,7 +4,7 @@ function authByRole(role = "business") {
    const rolesList = {
       admin: "isAdmin",
       business: "isBusiness",
-      standard: "standard",
+      user: "user",
    };
 
    if (!rolesList[role]) {
@@ -23,7 +23,16 @@ function authByRole(role = "business") {
          //adding the user key to the req obj
          req.user = payload;
 
-         if (role === "standard") return next();
+         //validates if request is made by the logged user
+         if (role === "user") {
+            const _id = req.params.id;
+            if (!req.user.isAdmin && req.user._id !== _id) {
+               return res
+                  .status(400)
+                  .send("Denied. You need to be the registered user or Admin");
+            }
+            return next();
+         }
          //checks if role is not allowed
          if (!payload[roleKey]) {
             return res.status(400).send(`Access denied, ${role} only.`);
