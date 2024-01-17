@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const { validateEmptyString } = require("./utils/validateEmptyString.util");
 
 const userSchema = new mongoose.Schema(
    {
@@ -9,7 +10,7 @@ const userSchema = new mongoose.Schema(
          middle: {
             type: String,
             required: false,
-            minlength: 0,
+            validate: (v) => validateEmptyString(v, 2),
             maxlength: 256,
          },
 
@@ -40,10 +41,15 @@ const userSchema = new mongoose.Schema(
       image: {
          url: {
             type: String,
+            validate: (v) => validateEmptyString(v, 5),
+            default:
+               "https://www.seekpng.com/png/detail/966-9665493_my-profile-icon-blank-profile-image-circle.png",
          },
          alt: {
             type: String,
+            validate: (v) => validateEmptyString(v),
             maxlength: 256,
+            default: "Profile image",
          },
       },
       address: {
@@ -55,6 +61,7 @@ const userSchema = new mongoose.Schema(
          country: {
             type: String,
             required: true,
+            validate: (v) => validateEmptyString(v),
             minlength: 2,
             maxlength: 256,
          },
