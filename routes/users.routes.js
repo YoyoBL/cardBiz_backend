@@ -113,4 +113,13 @@ router.patch("/:id", validateMongoId, authByRole("user"), async (req, res) => {
    res.json(updatedUser);
 });
 
+router.delete("/:id", validateMongoId, authByRole("user"), async (req, res) => {
+   //process
+   const user = await User.findByIdAndDelete(req.params.id);
+   if (!user) return res.status(400).send("User not found");
+
+   //response
+   res.json(user);
+});
+
 module.exports = router;
