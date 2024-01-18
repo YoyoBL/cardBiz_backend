@@ -58,4 +58,37 @@ router.put("/:id", validateMongoId, getToken, async (req, res) => {
    res.json(updateCard);
 });
 
+router.patch("/:id", validateMongoId, getToken, async (req, res) => {
+   //validate user
+   if (!req.user) return res.status(400).send("Registered users only.");
+
+   //process
+   const card = await Card.findById(req.params.id);
+   if (!card) {
+      res.status(400).send("Card id does'nt exist.");
+      return false;
+   }
+
+   function handleLikes() {
+      const alreadyLiked = card.likes.some((userId) => userId === req.user._id);
+
+      if (alreadyLiked) {
+         return card.likes.filter((like) => like !== req.user._id);
+      }
+      card.likes.push(req.user._id);
+      return card.likes;
+   }
+
+   const updatedCard = await Card.findByIdAndUpdate(
+      card._id,
+      { likes: handleLikes() },
+      {
+         new: true,
+      }
+   );
+
+   //response
+   res.json(updatedCard);
+});
+
 module.exports = router;
