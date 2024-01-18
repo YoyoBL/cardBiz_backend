@@ -58,6 +58,7 @@ router.put("/:id", validateMongoId, getToken, async (req, res) => {
    res.json(updateCard);
 });
 
+// LIKE CARD
 router.patch("/:id", validateMongoId, getToken, async (req, res) => {
    //validate user
    if (!req.user) return res.status(400).send("Registered users only.");
@@ -89,6 +90,21 @@ router.patch("/:id", validateMongoId, getToken, async (req, res) => {
 
    //response
    res.json(updatedCard);
+});
+
+//DELETE CARD
+router.delete("/:id", validateMongoId, getToken, async (req, res) => {
+   //validate user
+   if (!req.user) return res.status(400).send("Registered users only.");
+   //validate system
+   const card = await getCardById(req, res);
+   if (!card) return;
+
+   //process
+   const deletedCard = await Card.findByIdAndDelete(req.params.id);
+
+   //response
+   res.json(deletedCard);
 });
 
 module.exports = router;
