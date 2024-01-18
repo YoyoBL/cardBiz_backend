@@ -40,7 +40,7 @@ function authByRole(role = "business") {
 
          return next();
       } catch (error) {
-         res.status(400).send("Invalid token.");
+         return res.status(400).send("Invalid token.");
       }
    };
 }
