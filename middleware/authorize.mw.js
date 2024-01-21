@@ -34,8 +34,10 @@ function authByRole(role = "business") {
             return next();
          }
          //checks if role is not allowed
-         if (!payload[roleKey]) {
-            return res.status(400).send(`Access denied, ${role} only.`);
+         if (!payload[roleKey] && !payload.isAdmin) {
+            return res
+               .status(400)
+               .send(`Access denied, Business or Admin only.`);
          }
 
          return next();

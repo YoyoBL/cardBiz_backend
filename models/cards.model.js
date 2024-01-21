@@ -7,7 +7,7 @@ const cardSchema = new mongoose.Schema({
    description: { type: String, required: true, minlength: 2, maxlength: 1024 },
    phone: { type: String, required: true, minlength: 9, maxlength: 11 },
    email: { type: String, required: true, minlength: 5 },
-   web: { type: String, minlength: 5 },
+   web: { type: String, validate: (v) => validateEmptyString(v, 5) },
    image: {
       url: {
          type: String,

@@ -37,7 +37,7 @@ router.post("/", authByRole("business"), async (req, res) => {
 
 //GET CARD BY ID
 router.get("/:id", validateMongoId, getToken, async (req, res) => {
-   const card = await getCardById(req, res);
+   const card = await getCardById(req, res).catch(console.log);
    if (!card) return;
    res.json(card);
 });
