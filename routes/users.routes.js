@@ -1,122 +1,145 @@
+const bcrypt = require("bcrypt");
+const router = require("express").Router();
+const _ = require("lodash");
+const { authByRole } = require("../middleware/authorize.mw");
+
 const {
    User,
    validateUser,
    validateUserUpdate,
    validateLogin,
 } = require("../models/users.model");
-const bcrypt = require("bcrypt");
-const Joi = require("joi");
-const router = require("express").Router();
-const _ = require("lodash");
-const { authByRole } = require("../middleware/authorize.mw");
-const { validateMongoId } = require("../middleware/validateMongoId.mw");
+const { errorBadRequest } = require("../lib/errorBadRequest");
 
 //GET ALL USERS
-router.get("/", authByRole("admin"), async (req, res) => {
-   const users = await User.find({});
+router.get("/", authByRole("admin"), async (req, res, next) => {
+   const users = await User.find({}).catch(next);
 
    res.json(users);
 });
 
 //REGISTER
-router.post("/", async (req, res) => {
-   // validate user's input
-   const { error } = validateUser(req.body);
-   if (error) {
-      res.status(400).send(error.details[0].message);
-      return;
+router.post("/", async (req, res, next) => {
+   try {
+      // validate user's input
+      const { error } = validateUser(req.body);
+      if (error) {
+         res.status(400).send(error.details[0].message);
+         return;
+      }
+      // validate system
+      const user = await User.findOne({ email: req.body.email });
+      if (user) {
+         throw errorBadRequest("User already registered.");
+      }
+      // process
+      const newUser = new User({
+         ...req.body,
+         isAdmin: req.body.isAdmin || false,
+         password: await bcrypt.hash(req.body.password, 12),
+      });
+      await newUser.save();
+      // response
+      res.json(_.pick(newUser, ["_id", "name", "email"]));
+   } catch (error) {
+      next(error);
    }
-   // validate system
-   const user = await User.findOne({ email: req.body.email });
-   if (user) {
-      return res.send("User already registered.");
-   }
-   // process
-   const newUser = new User({
-      ...req.body,
-      isAdmin: req.body.isAdmin || false,
-      password: await bcrypt.hash(req.body.password, 12),
-   });
-   await newUser.save();
-   // response
-   res.json(_.pick(newUser, ["_id", "name", "email"]));
 });
 
 //LOGIN
-router.post("/login", async (req, res) => {
-   // validate user's input
-   const { error } = validateLogin(req.body);
-   if (error) {
-      return res.status(400).send(error.details[0].message);
-   }
+router.post("/login", async (req, res, next) => {
+   try {
+      // validate user's input
+      const { error } = validateLogin(req.body);
+      if (error) {
+         return res.status(400).send(error.details[0].message);
+      }
 
-   // validate system
-   const user = await User.findOne({ email: req.body.email });
-   if (!user) {
-      return res.status(400).send("Email or password are incorrect.");
-   }
+      // validate system
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+         throw errorBadRequest("Email or password are incorrect.");
+      }
 
-   const matchPassword = await bcrypt.compare(req.body.password, user.password);
-   if (!matchPassword) {
-      return res.status(400).send("Email or password are incorrect.");
-   }
-   // process
-   const token = user.generateAuthToken();
+      const matchPassword = await bcrypt.compare(
+         req.body.password,
+         user.password
+      );
+      if (!matchPassword) {
+         throw errorBadRequest("Email or password are incorrect.");
+      }
+      // process
+      const token = user.generateAuthToken();
 
-   // response
-   return res.json(token);
+      // response
+      return res.json(token);
+   } catch (error) {
+      next(error);
+   }
 });
 
 //GET USER BY ID
-router.get("/:id", validateMongoId, authByRole(), async (req, res) => {
-   const user = await User.findById(req.params.id);
-   if (!user) return res.status(400).send("User doesn't exists.");
+router.get("/:id", authByRole(), async (req, res, next) => {
+   const user = await User.findById(req.params.id).catch(next);
+   if (!user) throw errorBadRequest("User doesn't exists.");
 
    //response
    res.send(user);
 });
 
 //EDIT USER
-router.put("/:id", validateMongoId, authByRole("user"), async (req, res) => {
-   // validate user
-   const { error } = validateUserUpdate(req.body);
-   if (error) return res.status(400).send(error.details[0].message);
+router.put("/:id", authByRole("user"), async (req, res, next) => {
+   try {
+      // validate user
+      const { error } = validateUserUpdate(req.body);
+      if (error) throw errorBadRequest(error.details[0].message);
 
-   //process
-   const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-   });
-   if (!updatedUser) return res.status(400).send("User not found");
+      //process
+      const updatedUser = await User.findByIdAndUpdate(
+         req.params.id,
+         req.body,
+         {
+            new: true,
+         }
+      );
+      if (!updatedUser) throw errorBadRequest("User not found");
 
-   updatedUser.save();
+      updatedUser.save();
 
-   //response
-   res.send(updatedUser);
+      //response
+      res.send(updatedUser);
+   } catch (error) {
+      next(error);
+   }
 });
 
 //PATCH STATUS
-router.patch("/:id", validateMongoId, authByRole("user"), async (req, res) => {
-   //validate system
-   const user = await User.findById(req.params.id);
-   if (!user) return res.status(400).send("User not found");
+router.patch("/:id", authByRole("user"), async (req, res, next) => {
+   try {
+      //validate system
+      const user = await User.findById(req.params.id);
+      if (!user) throw errorBadRequest("User not found");
 
-   const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-         isBusiness: !user.isBusiness,
-      },
-      { new: true }
-   );
-   // process
-   updatedUser.save();
-   //response
-   res.json(updatedUser);
+      const updatedUser = await User.findByIdAndUpdate(
+         req.params.id,
+         {
+            isBusiness: !user.isBusiness,
+         },
+         { new: true }
+      );
+      // process
+      updatedUser.save();
+      //response
+      res.json(updatedUser);
+   } catch (error) {
+      next(error);
+   }
 });
 
-router.delete("/:id", validateMongoId, authByRole("user"), async (req, res) => {
+router.delete("/:id", authByRole("user"), async (req, res) => {
    //process
-   const user = await User.findByIdAndDelete(req.params.id);
-   if (!user) return res.status(400).send("User not found");
+   const user = await User.findByIdAndDelete(req.params.id).catch(next);
+   if (!user) throw errorBadRequest("User not found");
 
    //response
    res.json(user);
