@@ -10,6 +10,7 @@ const {
    validateLogin,
 } = require("../models/users.model");
 const { errorBadRequest } = require("../lib/errorBadRequest");
+const { validateMongoId } = require("../middleware/validateMongoId.mw");
 
 //GET ALL USERS
 router.get("/", authByRole("admin"), async (req, res, next) => {
@@ -79,64 +80,78 @@ router.post("/login", async (req, res, next) => {
 });
 
 //GET USER BY ID
-router.get("/:id", authByRole(), async (req, res, next) => {
-   const user = await User.findById(req.params.id).catch(next);
-   if (!user) throw errorBadRequest("User doesn't exists.");
+router.get("/:id", validateMongoId, authByRole(), async (req, res, next) => {
+   try {
+      const user = await User.findById(req.params.id);
+      if (!user) throw errorBadRequest("User doesn't exists.");
 
-   //response
-   res.send(user);
+      //response
+      res.send(user);
+   } catch (error) {
+      next(error);
+   }
 });
 
 //EDIT USER
-router.put("/:id", authByRole("user"), async (req, res, next) => {
-   try {
-      // validate user
-      const { error } = validateUserUpdate(req.body);
-      if (error) throw errorBadRequest(error.details[0].message);
+router.put(
+   "/:id",
+   validateMongoId,
+   authByRole("user"),
+   async (req, res, next) => {
+      try {
+         // validate user
+         const { error } = validateUserUpdate(req.body);
+         if (error) throw errorBadRequest(error.details[0].message);
 
-      //process
-      const updatedUser = await User.findByIdAndUpdate(
-         req.params.id,
-         req.body,
-         {
-            new: true,
-         }
-      );
-      if (!updatedUser) throw errorBadRequest("User not found");
+         //process
+         const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+               new: true,
+            }
+         );
+         if (!updatedUser) throw errorBadRequest("User not found");
 
-      updatedUser.save();
+         updatedUser.save();
 
-      //response
-      res.send(updatedUser);
-   } catch (error) {
-      next(error);
+         //response
+         res.send(updatedUser);
+      } catch (error) {
+         next(error);
+      }
    }
-});
+);
 
 //PATCH STATUS
-router.patch("/:id", authByRole("user"), async (req, res, next) => {
-   try {
-      //validate system
-      const user = await User.findById(req.params.id);
-      if (!user) throw errorBadRequest("User not found");
+router.patch(
+   "/:id",
+   validateMongoId,
+   authByRole("user"),
+   async (req, res, next) => {
+      try {
+         //validate system
+         const user = await User.findById(req.params.id);
+         if (!user) throw errorBadRequest("User not found");
 
-      const updatedUser = await User.findByIdAndUpdate(
-         req.params.id,
-         {
-            isBusiness: !user.isBusiness,
-         },
-         { new: true }
-      );
-      // process
-      updatedUser.save();
-      //response
-      res.json(updatedUser);
-   } catch (error) {
-      next(error);
+         const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+               isBusiness: !user.isBusiness,
+            },
+            { new: true }
+         );
+         // process
+         updatedUser.save();
+         //response
+         res.json(updatedUser);
+      } catch (error) {
+         next(error);
+      }
    }
-});
+);
 
-router.delete("/:id", authByRole("user"), async (req, res) => {
+router.delete("/:id", validateMongoId, authByRole("user"), async (req, res) => {
    //process
    const user = await User.findByIdAndDelete(req.params.id).catch(next);
    if (!user) throw errorBadRequest("User not found");

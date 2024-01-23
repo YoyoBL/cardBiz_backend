@@ -5,8 +5,8 @@
    "main": "app.js",
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "node .",
-      "dev": "nodemon ."
+      "start": "cross-env NODE_ENV=production node .",
+      "dev": "cross-env NODE_ENV=development nodemon ."
    },
    "keywords": [],
    "author": "",
@@ -25,6 +25,7 @@
       "morgan": "^1.10.0"
    },
    "devDependencies": {
+      "cross-env": "^7.0.3",
       "nodemon": "^3.0.2"
    }
 }

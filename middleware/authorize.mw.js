@@ -48,7 +48,6 @@ function authByRole(role = "business") {
 
 function authRegisteredUser(req, res, next) {
    const token = req.header("x-auth-token");
-   if (!token) throw errorBadRequest("Must provide token");
 
    try {
       const payload = jwt.verify(token, process.env.JWT_SECRET);
