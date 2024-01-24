@@ -27,21 +27,21 @@ router.get("/", async (req, res, next) => {
 router.post("/", authByRole("business"), async (req, res, next) => {
    try {
       //user validation
-      const { error } = validateCard(req.body);
+      const { value, error } = validateCard(req.body);
       if (error) {
          throw errorBadRequest("Joi error:" + error.details[0].message);
       }
       //process
-      console.log(req.user._id);
       const newCard = new Card({
-         ...req.body,
+         ...value,
          user_id: req.user._id,
       });
+
       await newCard.save();
 
       res.json(newCard);
    } catch (err) {
-      next(errorBadRequest("Mongoose schema error", err));
+      next(errorBadRequest("Mongoose schema error"), err);
    }
 });
 

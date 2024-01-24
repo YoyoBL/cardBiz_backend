@@ -23,7 +23,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
-initialize();
+// initialize();
 
 app.use("/cards", require("./routes/cards.routes"));
 app.use("/users", require("./routes/users.routes"));

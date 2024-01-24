@@ -41,13 +41,13 @@ const userSchema = new mongoose.Schema(
       image: {
          url: {
             type: String,
-            validate: (v) => validateEmptyString(v, 5),
+
             default:
                "https://www.seekpng.com/png/detail/966-9665493_my-profile-icon-blank-profile-image-circle.png",
          },
          alt: {
             type: String,
-            validate: (v) => validateEmptyString(v),
+
             maxlength: 256,
             default: "Profile image",
          },
@@ -151,8 +151,8 @@ function validateUser(user) {
          .required(),
 
       image: Joi.object({
-         url: Joi.string().uri().allow("").label("Image url"),
-         alt: Joi.string().min(2).max(40).allow("").label("Image alt"),
+         url: Joi.string().uri().empty("").label("Image url"),
+         alt: Joi.string().min(2).max(40).empty("").label("Image alt"),
       }),
       address: Joi.object({
          state: Joi.string().min(2).max(256).label("State"),

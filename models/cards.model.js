@@ -7,18 +7,19 @@ const cardSchema = new mongoose.Schema({
    description: { type: String, required: true, minlength: 2, maxlength: 1024 },
    phone: { type: String, required: true, minlength: 9, maxlength: 11 },
    email: { type: String, required: true, minlength: 5 },
-   web: { type: String, validate: (v) => validateEmptyString(v, 5) },
+   web: {
+      type: String,
+      validate: { validator: (v) => validateEmptyString(v, 5) },
+   },
    image: {
       url: {
          type: String,
          required: false,
-         validate: (v) => validateEmptyString(v, 14),
          default:
             "https://cdn.pixabay.com/photo/2016/04/20/08/21/entrepreneur-1340649_960_720.jpg",
       },
       alt: {
          type: String,
-         validate: (v) => validateEmptyString(v, 2),
          maxlength: 256,
          default: "BizCard Image",
       },
@@ -64,19 +65,8 @@ function validateCard(card) {
          .email({ tlds: { allow: false } }),
       web: Joi.string().min(5).allow("").required().label("Website"),
       image: Joi.object({
-         url: Joi.string()
-            .uri()
-            .min(14)
-            .uri()
-            .allow("")
-            .required()
-            .label("Image url"),
-         alt: Joi.string()
-            .min(2)
-            .max(256)
-            .allow("")
-            .required()
-            .label("Image alt"),
+         url: Joi.string().uri().min(14).uri().empty("").label("Image url"),
+         alt: Joi.string().min(2).max(256).empty("").label("Image alt"),
       }).required(),
       address: Joi.object({
          state: Joi.string().label("State").allow(""),

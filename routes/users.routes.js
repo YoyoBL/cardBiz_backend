@@ -23,7 +23,7 @@ router.get("/", authByRole("admin"), async (req, res, next) => {
 router.post("/", async (req, res, next) => {
    try {
       // validate user's input
-      const { error } = validateUser(req.body);
+      const { value, error } = validateUser(req.body);
       if (error) {
          res.status(400).send(error.details[0].message);
          return;
@@ -35,7 +35,7 @@ router.post("/", async (req, res, next) => {
       }
       // process
       const newUser = new User({
-         ...req.body,
+         ...value,
          isAdmin: req.body.isAdmin || false,
          password: await bcrypt.hash(req.body.password, 12),
       });
