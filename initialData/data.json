@@ -1,0 +1,123 @@
+{
+   "users": [
+      {
+         "name": { "first": "admin", "middle": "", "last": "admin" },
+         "phone": "0512345567",
+         "email": "admin@email.com",
+         "password": "Abc!123Abc",
+         "image": { "url": "", "alt": "" },
+         "address": {
+            "state": "IL",
+            "country": "Israel",
+            "city": "Arad",
+            "street": "Shoham",
+            "houseNumber": 5,
+            "zip": 8920435
+         },
+         "isBusiness": true,
+         "isAdmin": true,
+         "_id": "65b36662f0ed021c1614fc2c",
+         "createdAt": "2024-01-26T07:59:30.219Z"
+      },
+      {
+         "name": { "first": "biz", "middle": "", "last": "biz" },
+         "phone": "0512345567",
+         "email": "biz@email.com",
+         "password": "Abc!123Abc",
+         "image": { "url": "", "alt": "" },
+         "address": {
+            "state": "IL",
+            "country": "Israel",
+            "city": "Arad",
+            "street": "Shoham",
+            "houseNumber": 5,
+            "zip": 8920435
+         },
+         "isBusiness": true,
+         "isAdmin": false,
+         "_id": "65b36662f0ed021c1614fc2d",
+         "createdAt": "2024-01-26T07:59:30.220Z"
+      },
+      {
+         "name": { "first": "standard", "middle": "", "last": "standard" },
+         "phone": "0512345567",
+         "email": "standard@email.com",
+         "password": "Abc!123Abc",
+         "image": { "url": "", "alt": "" },
+         "address": {
+            "state": "IL",
+            "country": "Israel",
+            "city": "Arad",
+            "street": "Shoham",
+            "houseNumber": 5,
+            "zip": 8920435
+         },
+         "isBusiness": false,
+         "isAdmin": false,
+         "_id": "65b36662f0ed021c1614fc2e",
+         "createdAt": "2024-01-26T07:59:30.221Z"
+      }
+   ],
+   "cards": [
+      {
+         "title": "1st Card",
+         "subtitle": "a test value for this card",
+         "description": "a test value for new card\na test value for new card\n",
+         "phone": "052591381",
+         "email": "qwe@gmail.com",
+         "web": "",
+         "image": { "url": "", "alt": "" },
+         "address": {
+            "state": "IL",
+            "country": "Israel",
+            "city": "Arad",
+            "street": "Shoham",
+            "houseNumber": 5,
+            "zip": 8920435
+         },
+         "likes": [],
+         "_id": "65b3664e293a0b2315bd9922",
+         "createdAt": "2024-01-26T07:59:10.253Z"
+      },
+      {
+         "title": "2nd Card",
+         "subtitle": "a test value for this card",
+         "description": "a test value for new card\na test value for new card\n",
+         "phone": "052591381",
+         "email": "qwe@gmail.com",
+         "web": "",
+         "image": { "url": "", "alt": "" },
+         "address": {
+            "state": "IL",
+            "country": "Israel",
+            "city": "Arad",
+            "street": "Shoham",
+            "houseNumber": 5,
+            "zip": 8920435
+         },
+         "likes": [],
+         "_id": "65b3664e293a0b2315bd9923",
+         "createdAt": "2024-01-26T07:59:10.254Z"
+      },
+      {
+         "title": "3rd Card",
+         "subtitle": "a test value for this card",
+         "description": "a test value for new card\na test value for new card\n",
+         "phone": "052591381",
+         "email": "qwe@gmail.com",
+         "web": "",
+         "image": { "url": "", "alt": "" },
+         "address": {
+            "state": "IL",
+            "country": "Israel",
+            "city": "Arad",
+            "street": "Shoham",
+            "houseNumber": 5,
+            "zip": 8920435
+         },
+         "likes": [],
+         "_id": "65b3664e293a0b2315bd9924",
+         "createdAt": "2024-01-26T07:59:10.254Z"
+      }
+   ]
+}

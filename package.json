@@ -4,7 +4,7 @@
    "description": "",
    "main": "app.js",
    "scripts": {
-      "test": "nodemon test.js",
+      "seed": "nodemon initialData/initialData.js",
       "start": "cross-env NODE_ENV=production node .",
       "dev": "cross-env NODE_ENV=development nodemon ."
    },
