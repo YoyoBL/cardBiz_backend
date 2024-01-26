@@ -10,9 +10,8 @@ require("dotenv").config({
 });
 
 const { errorFileLogger } = require("./lib/errorFileLogger");
-const { initialize } = require("./lib/initialdata");
 
-const server = mongoose
+mongoose
    .connect(process.env.MONGO_URI)
    .then(() => console.log(chalk.bgGreen("Connected to DB")))
    .catch((err) => console.log(chalk.bgRed(`DB not connected, error: ${err}`)));
@@ -22,8 +21,6 @@ const app = express();
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
-
-// initialize();
 
 app.use("/cards", require("./routes/cards.routes"));
 app.use("/users", require("./routes/users.routes"));
