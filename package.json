@@ -4,8 +4,9 @@
    "description": "",
    "main": "app.js",
    "scripts": {
-      "seed": "nodemon initialData/initialData.js",
+      "seed-prod": "cross-env NODE_ENV=production nodemon initialData/initialData.js",
       "start": "cross-env NODE_ENV=production node .",
+      "seed-dev": "cross-env NODE_ENV=development nodemon initialData/initialData.js",
       "dev": "cross-env NODE_ENV=development nodemon ."
    },
    "keywords": [],

@@ -3,76 +3,55 @@ const { User } = require("../models/users.model");
 const { Card } = require("../models/cards.model");
 const bcrypt = require("bcrypt");
 const { users, cards } = require("./data.json");
+const { default: mongoose } = require("mongoose");
 
-async function initialize() {
-   const usersList = [
-      { first: "admin", mail: "admin", role: { admin: true, biz: true } },
-      { first: "biz", mail: "biz", role: { admin: false, biz: true } },
-      {
-         first: "standard",
-         mail: "standard",
-         role: { admin: false, biz: false },
-      },
-   ];
+const path = require("node:path");
+require("dotenv").config({
+   path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}`),
+});
 
-   console.log(
-      usersList.forEach(async (user) => {
-         const newUser = new User(
-            userTemplate(user.first, user.mail, {
-               biz: user.role.biz,
-               admin: user.role.admin,
-            })
+mongoose
+   .connect(process.env.MONGO_URI)
+   .then(() => console.log(chalk.bgGreen("Connected to DB")))
+   .then(() => init())
+   .catch((err) => console.log(chalk.bgRed(`DB not connected, error: ${err}`)));
+
+async function init() {
+   try {
+      const users = await generateUsers();
+
+      const bizId = users.find((user) => user.value.name.first === "biz").value
+         .id;
+      await generateCards(bizId);
+      console.log(chalk.bgBlue("Initial Users & Cards created."));
+      for (const user of users)
+         console.log(
+            chalk.bgGray(`${user.value.name.first} user login:`),
+            user.value.email
          );
-      })
-   );
-   // const users = await User.find({
-   //    "name.first": { $in: ["admin", "biz", "standard"] },
-   // });
-   // const initialUsers = [];
-   // if (users.length !== 3) {
-   //    usersList.forEach(async (user) => {
-   //       const newUser = new User(
-   //          userTemplate(user.first, user.mail, {
-   //             biz: user.role.biz,
-   //             admin: user.role.admin,
-   //          })
-   //       );
-   //       initialUsers.push({
-   //          ...newUser,
-   //          password: await bcrypt.hash(newUser.password, 12),
-   //       });
-   //    });
-
-   //    await User.create(initialUsers)
-   //       .then(() => console.log(chalk.bgBlue("Initial users created")))
-   //       .catch(console.log);
-   // }
-
-   //initialize cards
-   const cardsList = ["1st Card", "2nd Card", "3rd Card"];
-   const cards = [];
-   console.log(
-      cardsList.forEach(async (cardTitle) => {
-         const newCard = new Card(cardsTemplate(cardTitle));
-         cards.push(newCard);
-      })
-   );
-   return cards;
-   // const cards = await Card.find({
-   //    title: { $in: cardsList },
-   // });
-
-   // if (cards.length !== 3) {
-   //    const initialCards = [];
-   //    cardsList.forEach(async (cardTitle) => {
-   //       const newCard = new Card(cardsTemplate(cardTitle));
-   //       initialCards.push(newCard);
-   //    });
-
-   //    await Card.create(initialCards)
-   //       .then((data) => console.log(chalk.bgBlue("Initial cards created")))
-   //       .catch(console.log);
-   // }
+      console.log(chalk.bgGray("password for all:"), "Abc!123Abc");
+   } catch (error) {
+      console.log("Error while initializing data \n", error);
+   }
 }
 
-module.exports = { initialize };
+async function generateUsers() {
+   const usersPromises = [];
+   for (const user of users) {
+      const newUser = new User({
+         ...user,
+         password: await bcrypt.hash(user.password, 12),
+      }).save();
+      usersPromises.push(newUser);
+   }
+   return await Promise.allSettled(usersPromises);
+}
+
+async function generateCards(bizId) {
+   const cardsPromises = [];
+   for (const card of cards) {
+      const newCard = new Card(card).save();
+      cardsPromises.push(newCard);
+   }
+   return await Promise.allSettled(cardsPromises);
+}
