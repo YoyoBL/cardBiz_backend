@@ -40,8 +40,13 @@ exports.create = async (req, res, next) => {
 
 //GET CARD BY ID
 exports.getById = async (req, res, next) => {
-   const card = await getCardById(req, res).catch(next);
-   res.json(card);
+   try {
+      const card = await getCardById(req);
+      if (!card) throw errorBadRequest("Card Id does'nt exist");
+      res.json(card);
+   } catch (error) {
+      next(error);
+   }
 };
 
 //UPDATE CARD BY ID
@@ -53,7 +58,7 @@ exports.updateById = async (req, res, next) => {
          throw errorBadRequest(error.details[0].message);
       }
       //validate system
-      const card = await getCardById(req, res);
+      const card = await getCardById(req);
       if (!card) return;
 
       const updateCard = await Card.findByIdAndUpdate(card._id, req.body, {
@@ -68,6 +73,7 @@ exports.updateById = async (req, res, next) => {
 // LIKE CARD
 exports.likeCard = async (req, res, next) => {
    try {
+      console.log(req.params);
       //process
       const card = await getCardById(req);
 

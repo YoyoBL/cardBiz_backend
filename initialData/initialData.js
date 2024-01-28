@@ -18,16 +18,17 @@ mongoose
 
 async function init() {
    try {
-      const users = await generateUsers();
+      await generateUsers();
 
-      const bizId = users.find((user) => user.value.name.first === "biz").value
-         .id;
+      const biz = await User.findOne({ "name.first": "biz" });
+      const bizId = biz._id.toString();
       await generateCards(bizId);
+
       console.log(chalk.bgBlue("Initial Users & Cards created."));
       for (const user of users)
          console.log(
-            chalk.bgGray(`${user.value.name.first} user login:`),
-            user.value.email
+            chalk.bgGray(`${user.name.first} user login:`),
+            user.email
          );
       console.log(chalk.bgGray("password for all:"), "Abc!123Abc");
    } catch (error) {
@@ -41,7 +42,9 @@ async function generateUsers() {
       const newUser = new User({
          ...user,
          password: await bcrypt.hash(user.password, 12),
-      }).save();
+      })
+         .save()
+         .catch(() => {});
       usersPromises.push(newUser);
    }
    return await Promise.allSettled(usersPromises);
@@ -50,7 +53,9 @@ async function generateUsers() {
 async function generateCards(bizId) {
    const cardsPromises = [];
    for (const card of cards) {
-      const newCard = new Card(card).save();
+      const newCard = new Card({ ...card, user_id: bizId })
+         .save()
+         .catch(() => {});
       cardsPromises.push(newCard);
    }
    return await Promise.allSettled(cardsPromises);

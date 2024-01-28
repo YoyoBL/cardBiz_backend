@@ -7,7 +7,10 @@ const {
    validateLogin,
 } = require("../models/users.model");
 const { errorBadRequest } = require("../lib/errorBadRequest");
-const { checkLoginAttempts } = require("../lib/checkLoginAttempts");
+const {
+   checkLoginAttempts,
+   clearAttempts,
+} = require("../lib/checkLoginAttempts");
 
 exports.getUsers = async (req, res, next) => {
    const users = await User.find({}).catch(next);
@@ -65,6 +68,7 @@ exports.login = async (req, res, next) => {
          next(error);
          return;
       }
+      clearAttempts(user.email);
       // process
       const token = user.generateAuthToken();
 
@@ -133,11 +137,15 @@ exports.patchStatus = async (req, res, next) => {
       next(error);
    }
 };
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
    //process
-   const user = await User.findByIdAndDelete(req.params.id).catch(next);
-   if (!user) throw errorBadRequest("User not found");
+   try {
+      const user = await User.findByIdAndDelete(req.params.id);
+      if (!user) throw errorBadRequest("User not found");
 
-   //response
-   res.json(user);
+      //response
+      res.json(user);
+   } catch (error) {
+      next(error);
+   }
 };
