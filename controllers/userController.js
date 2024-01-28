@@ -7,6 +7,7 @@ const {
    validateLogin,
 } = require("../models/users.model");
 const { errorBadRequest } = require("../lib/errorBadRequest");
+const { checkLoginAttempts } = require("../lib/checkLoginAttempts");
 
 exports.getUsers = async (req, res, next) => {
    const users = await User.find({}).catch(next);
@@ -60,7 +61,9 @@ exports.login = async (req, res, next) => {
          user.password
       );
       if (!matchPassword) {
-         throw errorBadRequest("Email or password are incorrect.");
+         const error = await checkLoginAttempts(user.email);
+         next(error);
+         return;
       }
       // process
       const token = user.generateAuthToken();
