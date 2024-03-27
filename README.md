@@ -1,8 +1,9 @@
 # Readme
 
 ## About Me
-- **Name:** Yoel BarLev
-- **Email:** yoelbl2@gmail.com
+
+-  **Name:** Yoel BarLev
+-  **Email:** yoelbl2@gmail.com
 
 ## Instructions
 
@@ -12,8 +13,8 @@
 
 ## Optional
 
-- Run `npm run seed-prod` to initialize data in the production environment.
-- Run `npm start` for the production environment.
+-  Run `npm run seed-prod` to initialize data in the production environment.
+-  Run `npm start` for the production environment.
 
 ## Bonuses
 
@@ -22,17 +23,16 @@
 
 ## Technologies
 
-- bcrypt
-- chalk
-- config
-- cors
-- dotenv
-- express
-- joi
-- jsonwebtoken
-- lodash
-- mongoose
-- morgan
-- yup
-- cross-env
-- nodemon
+-  bcrypt
+-  chalk
+-  cors
+-  dotenv
+-  express
+-  joi
+-  jsonwebtoken
+-  lodash
+-  mongoose
+-  morgan
+-  yup
+-  cross-env
+-  nodemon
